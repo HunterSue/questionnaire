@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>测测你今年的好运</title>
+    <link rel="icon" type="image/png" sizes="144x144" href="/static/星座.png"/>
+    <!--导入jq文件-->
+	<script src="{%static 'jq3.4.1.min.js'%}"></script>
+    <script src="{%static 'jquery.shCircleLoader.js'%}"></script>
+    <script>
+        function push_data() {
+            let name = document.getElementById("name");
+            let phone = document.getElementById("phone");
+            let age = document.getElementById("age");
+            let sx = document.getElementById("sx");
+            let region = document.getElementById("region");
+            if (age.value >= 120 ){
+                alert("请勿超越120岁！")
+            }
+            else if(name.value == ""){
+                alert("姓名不能为空")
+            }
+             else if(phone.value == ""){
+                alert("手机不能为空")
+            }
+              else if(age.value == ""){
+                alert("年龄不能为空")
+            }
+            else {
+                $.ajax({
+					url: 'http://127.0.0.1:8000/content/add_massage/',
+    				type: 'post',
+    				dataType: 'json',
+    				data: {
+						name:name.value,
+                        phone:phone.value,
+                        age:age.value,
+                        sx:sx.value,
+                        region:region.value,
+   					 },
+					success: function(data){
+						if(data.state == "ok"){		//成功了就设置cookie和跳转
+                            let  luck_number = data.number;
+                            login(luck_number);
+
+						}
+						if(data.state == "ERROR"){		//失败，重新输入
+							alert("请不要进行违法操作");
+						}
+
+    				},
+   					 error: function(err){			//服务器故障
+							alert("服务器开小差了！！！如有疑问请致电IT部：3000");
+					}
+				 })
+            }
+
+        }
+
+        function login(lunck) {
+            document.getElementById("content").style.display='none';//隐藏输入div
+            //显示计算动画
+            $('#loader').shCircleLoader({color: "#DE1D5A"});
+            var i = 0;
+            setInterval(function() {
+            $('#loader').shCircleLoader('progress',"AI计算中："+ i + '%');
+                if (++i > 100)
+                {
+                    //结束循环
+                    $('#loader').shCircleLoader('destroy');
+                //显示结果div
+            document.getElementById("jg").style.display='block';//隐藏输入div
+                    //显示幸运值
+                document.getElementById("luck_number").innerHTML = lunck;
+                }
+            }, 100);
+
+        }
+    </script>
+</head>
+<body style="background-image: url({% static 'bg.gif' %});background-size: cover;" >
+<!--内容-->
+    <div id="top">
+        2020运气大测试
+    </div>
+<!--问题内容-->
+    <div id="content">
+        <div style="font-size: 3rem;color:#25C6FC;font-weight: bold;padding-top: 3rem">请输入下面信息快来测测你的运气吧！</div>
+        <div style="clear: left;padding-top: 8rem;">
+            <div class="tc">姓名</div>
+            <div class="ic"><input type="text" maxlength="20" class="inp" id="name"></div>
+        </div>
+
+        <div style="clear: left;padding-top: 8rem;">
+            <div class="tc">手机</div>
+            <div class="ic"><input type="text" maxlength="11" class="inp" id="phone"></div>
+        </div>
+
+        <div style="clear: left;padding-top: 8rem;">
+            <div class="tc">年龄</div>
+            <div class="ic"><input type="number" maxlength="3" class="inp" id="age"></div>
+        </div>
+
+        <div style="clear: left;padding-top: 8rem;">
+            <div class="tc">生肖</div>
+            <div class="ic">
+                <select class="inp" id="sx">
+                <option value="鼠">鼠</option>
+                <option value="牛">牛</option>
+                <option value="兔">兔</option>
+                <option value="龙">龙</option>
+                 <option value="蛇">蛇</option>
+                <option value="马">马</option>
+                <option value="羊">羊</option>
+                <option value="猴">猴</option>
+                <option value="鸡">鸡</option>
+                <option value="狗">狗</option>
+                <option value="猪">猪</option>
+                <option value="虎">虎</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="clear: left;padding-top: 8rem;">
+            <div class="tc">地区</div>
+            <div class="ic">
+                <select class="inp" id="region">
+                <option value="华南">华南</option>
+                <option value="华西">华西</option>
+                <option value="华东">华东</option>
+                <option value="华北">华北</option>
+                <option value="华中">华中</option>
+                </select>
+            </div>
+        </div>
+    <!--数据提交-->
+        <div style="clear: left;padding-top: 7rem;">
+            <input type="submit" value="提交"  style="width: 10rem;height: 5rem;font-size: 3rem;font-weight: bold;background-color:#25C6FC;border-radius: 20px;border: 0 solid " onclick="push_data()">
+        </div>
+    </div>
+    <!--加载动画-->
+        <div style="margin-top: 10rem;margin-left: 8%">
+    <span id="loader" style="width: 50rem;height: 50rem;color: snow;font-size: 5rem;font-weight: bold;"></span>
+      </div>
+    <!--幸运值-->
+    <div id="jg">
+        你的2020幸运值<br><br>
+        <div id="luck_number" style="color: red"></div>
+    </div>
+    <!--版权归属-->
+    <div id="tips">
+        作者：苏建辉
+        <br>
+        注意：该作品只供参考与学习，请勿用于违法犯罪用途。
+    </div>
+
+</body>
+<style>
+    #jg{
+        width: 50rem;
+        height: 33rem;
+        background-color: rgba(163,159,147,0.9);
+        margin-left: 8%;
+        border-radius: 20px;
+        display: none;
+        text-align: center;
+        padding-top: 16rem;
+        font-size: 5rem;
+        font-weight: bold;
+        margin-top: 10rem;
+    }
+    #tips{
+        color: snow;
+        font-size: 2rem;
+        margin-top: 15rem;
+        font-weight: bold;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+    }
+    .inp{
+        width: 30rem;
+        height: 5rem;
+        border-radius: 20px;
+        font-size: 3rem;
+    }
+    .tc{
+        width: 30%;
+        float: left;
+        height: 3rem;
+        font-size: 5rem;
+    }
+    .ic{
+        width: 70%;
+        float: left;
+        height: 3rem;
+    }
+    #content{
+        width: 90%;
+        height: 75rem;
+        background-color: rgba(163,159,147,0.8);
+        margin-top: 5%;
+        margin-left: 5%;
+        border-radius: 20px;
+        text-align: center;
+    }
+    #top{
+        width: 100%;
+        height: 7rem;
+        color: #FAFFEB;
+        font-size: 5rem;
+        text-align: center;
+        font-weight: bold;
+        margin-top: 15%;
+        background-color: rgba(157,211,250,0.6);
+    }
+</style>
+</html>
